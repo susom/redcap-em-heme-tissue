@@ -39,16 +39,3 @@ This EM generates an annual report in the following format
     2014    241
     total   17004
 
-sample_date
-tis_type=1 for cells and tis_type=4 for Plasma
-lab_source=1
-
-1, PB (peripheral blood)
-2, BMA (bone marrow aspirate)
-3, Serum
-4, Plasma
-5, Whole Blood
-6, Buffy Coat
-7, Granulocyte
-8, Eosinophil
-999, Unknown
