@@ -6,8 +6,6 @@ require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 // http://localhost/redcap_v10.8.2/ExternalModules/?prefix=redcap-em-heme-tissue&page=annualReport&pid=32
 global $module ;
 
-$module->emDebug("***** I am in annualReport ****");
-
 function readQueryResults($sql) {
     global $module;
 
@@ -23,7 +21,7 @@ function readQueryResults($sql) {
     } else {
         $data = array();
         while ($row = db_fetch_assoc($rptdata)) {
-            $module->emDebug(print_r($row,TRUE));
+//            $module->emDebug(print_r($row,TRUE));
             $data[]  = $row;
         }
         $result["data"]  = $data;
@@ -43,7 +41,7 @@ $sql= "select substr(rd1.value, 1, 4) year, count(1) cnt
                               and rd1.record = rd3.record and
                              (rd1.instance = rd3.instance or (rd1.instance is null and rd3.instance is null))
             where rd1.field_name = 'sample_date'
-              and rd1.project_id = 32
+              and rd1.project_id = ".$_GET['pid']."
               and rd2.field_name = 'lab_source'
               and rd2.value = '1'
               and rd3.field_name = 'tis_type'
@@ -67,7 +65,7 @@ from redcap_data rd1
                  (rd1.instance = rd2.instance or (rd1.instance is null and rd2.instance is null))
 
 where rd1.field_name = 'tis_type'
-  and rd1.project_id = 32
+  and rd1.project_id = ".$_GET['pid']."
   and rd2.field_name = 'lab_source'
   and rd2.value = '1'
 group by rd1.value
@@ -84,7 +82,7 @@ from redcap_data rd1
                  (rd1.instance = rd2.instance or (rd1.instance is null and rd2.instance is null))
 
 where rd1.field_name = 'tis_type'
-  and rd1.project_id = 32
+  and rd1.project_id = ".$_GET['pid']."
   and rd2.field_name = 'lab_source'
   and rd2.value = '1'
 group by rd1.project_id";
@@ -92,7 +90,23 @@ group by rd1.project_id";
 $rptdata = readQueryResults($sql);
 $result["totalCounts"] = $rptdata["data"];
 
-$module->emDebug("all done: " . print_r($result,TRUE));
+$sql = "select rd1.value, count(1) cnt
+from redcap_data rd1
+         join redcap_data rd2
+              on rd1.project_id = rd2.project_id and rd1.event_id = rd2.event_id
+                  and rd1.record = rd2.record and
+                 (rd1.instance = rd2.instance or (rd1.instance is null and rd2.instance is null))
+
+where rd1.field_name = 'gender'
+  and rd1.project_id = 32
+  and rd2.field_name = 'lab_source'
+  and rd2.value = '1'
+group by rd1.value
+order by rd1.value";
+
+
+$rptdata = readQueryResults($sql);
+$result["genderCounts"] = $rptdata["data"];
 
 ?>
 <!doctype html>
@@ -130,6 +144,26 @@ $module->emDebug("all done: " . print_r($result,TRUE));
                                 <tr>
                                     <td><?php echo $eventData["sample_cnt"] ?></td>
                                     <td><?php echo $eventData["pt_cnt"] ?></td>
+                                </tr>
+                                <?php
+
+                            }
+                            ?>
+                        </table>
+                        <table id="cellsTable" class="table table-striped table-bordered" >
+                            <thead>
+                            <tr>
+                                <th>Gender</th>
+                                <th>Count</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php
+                            foreach($result["genderCounts"]  as $key => $eventData) {
+                                ?>
+                                <tr>
+                                    <td><?php echo $eventData["value"] ?></td>
+                                    <td><?php echo $eventData["cnt"] ?></td>
                                 </tr>
                                 <?php
 
