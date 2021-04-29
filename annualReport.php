@@ -150,7 +150,6 @@ $result["genderCounts"] = $rptdata["data"];
                             }
                             ?>
                         </table>
-
                         <table id="cellsTable" class="table table-striped table-bordered" >
                             <thead>
                             <tr>
