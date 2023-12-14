@@ -38,13 +38,15 @@ class HemeTissue extends \ExternalModules\AbstractExternalModule {
     public function runQueries() {
 
         // SQL to generate the histogram query by year for the given sample type
+        $data_table = method_exists('\REDCap', 'getDataTable') ? \REDCap::getDataTable($_GET['pid']) : "redcap_data";
+
         $sql= "select substr(rd1.value, 1, 4) year, count(1) cnt
-            from redcap_data rd1
-                     join redcap_data rd2
+            from $data_table rd1
+                     join $data_table rd2
                           on rd1.project_id = rd2.project_id and rd1.event_id = rd2.event_id
                               and rd1.record = rd2.record and
                              (rd1.instance = rd2.instance or (rd1.instance is null and rd2.instance is null))
-                     join redcap_data rd3
+                     join $data_table rd3
                           on rd1.project_id = rd3.project_id and rd1.event_id = rd3.event_id
                               and rd1.record = rd3.record and
                              (rd1.instance = rd3.instance or (rd1.instance is null and rd3.instance is null))
@@ -70,8 +72,8 @@ class HemeTissue extends \ExternalModules\AbstractExternalModule {
         $result["plasmaByYear"] = $rptdata["data"];
 
         $sql = "select rd1.value, count(1) cnt
-        from redcap_data rd1
-                 join redcap_data rd2
+        from $data_table rd1
+                 join $data_table rd2
                       on rd1.project_id = rd2.project_id and rd1.event_id = rd2.event_id
                           and rd1.record = rd2.record and
                          (rd1.instance = rd2.instance or (rd1.instance is null and rd2.instance is null))
@@ -87,8 +89,8 @@ class HemeTissue extends \ExternalModules\AbstractExternalModule {
         $result["sampleTypes"] = $rptdata["data"];
 
         $sql = "select  count(1) sample_cnt, count(distinct rd1.record) pt_cnt
-        from redcap_data rd1
-                 join redcap_data rd2
+        from $data_table rd1
+                 join $data_table rd2
                       on rd1.project_id = rd2.project_id and rd1.event_id = rd2.event_id
                           and rd1.record = rd2.record and
                          (rd1.instance = rd2.instance or (rd1.instance is null and rd2.instance is null))
@@ -103,8 +105,8 @@ class HemeTissue extends \ExternalModules\AbstractExternalModule {
         $result["totalCounts"] = $rptdata["data"];
 
         $sql = "select rd1.value, count(1) cnt
-        from redcap_data rd1
-                 join redcap_data rd2
+        from $data_table rd1
+                 join $data_table rd2
                       on rd1.project_id = rd2.project_id and rd1.event_id = rd2.event_id
                           and rd1.record = rd2.record and
                          (rd1.instance = rd2.instance or (rd1.instance is null and rd2.instance is null))
